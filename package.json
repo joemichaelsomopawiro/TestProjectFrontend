@@ -1,0 +1,30 @@
+{
+  "name": "online_shop_frontend",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.7.2",
+    "animate.css": "^4.1.1",
+    "axios": "^1.7.9",
+    "countup.js": "^2.8.0",
+    "leaflet": "^1.9.4",
+    "pinia": "^2.3.1",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "vite": "^6.0.11",
+    "vite-plugin-vue-devtools": "^7.7.0"
+  },
+  "allowScripts": {
+    "esbuild@0.25.0": true,
+    "vue-demi@0.14.10": true
+  }
+}
