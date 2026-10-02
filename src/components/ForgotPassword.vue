@@ -21,56 +21,101 @@
       </div>
 
       <!-- Forgot/Reset Password Form -->
-      <form @submit.prevent="handleSubmit" class="space-y-6 animate__animated animate__fadeInUp animate__delay-2s">
+      <form @submit.prevent="handleSubmit" class="space-y-5 animate__animated animate__fadeInUp animate__delay-2s">
         <div class="group">
-          <label for="email" class="block text-sm font-semibold text-emerald-700 uppercase tracking-wide">Email</label>
+          <label for="email" class="block text-sm font-semibold text-emerald-700 uppercase tracking-wide">
+            Email / Nomor HP <span class="text-red-500">*</span>
+          </label>
           <input
             id="email"
-            type="email"
-            v-model="email"
+            type="text"
+            v-model.trim="email"
             required
             class="mt-2 block w-full rounded-lg border border-emerald-200 p-3 text-gray-900 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 group-hover:border-emerald-300"
-            placeholder="Enter your email"
+            placeholder="Masukkan email atau no. HP akun Anda"
             :disabled="loading"
           />
         </div>
+
         <div class="group">
-          <label for="password" class="block text-sm font-semibold text-emerald-700 uppercase tracking-wide">New Password</label>
+          <label for="tanggal_lahir" class="block text-sm font-semibold text-emerald-700 uppercase tracking-wide">
+            Tanggal Lahir Terdaftar <span class="text-red-500">*</span>
+          </label>
           <input
-            id="password"
-            type="password"
-            v-model="password"
+            id="tanggal_lahir"
+            type="date"
+            v-model="tanggal_lahir"
             required
             class="mt-2 block w-full rounded-lg border border-emerald-200 p-3 text-gray-900 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 group-hover:border-emerald-300"
-            placeholder="New password"
             :disabled="loading"
           />
+          <p class="text-xs text-gray-500 mt-1">Gunakan tanggal lahir yang Anda daftarkan saat membuat akun.</p>
         </div>
+
         <div class="group">
-          <label for="password_confirmation" class="block text-sm font-semibold text-emerald-700 uppercase tracking-wide">Confirm Password</label>
-          <input
-            id="password_confirmation"
-            type="password"
-            v-model="password_confirmation"
-            required
-            class="mt-2 block w-full rounded-lg border border-emerald-200 p-3 text-gray-900 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 group-hover:border-emerald-300"
-            placeholder="Confirm password"
-            :disabled="loading"
-          />
+          <label for="password" class="block text-sm font-semibold text-emerald-700 uppercase tracking-wide">
+            Kata Sandi Baru <span class="text-red-500">*</span>
+          </label>
+          <div class="relative mt-2">
+            <input
+              id="password"
+              :type="showPassword ? 'text' : 'password'"
+              v-model="password"
+              required
+              class="block w-full rounded-lg border border-emerald-200 p-3 pr-10 text-gray-900 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 group-hover:border-emerald-300"
+              placeholder="Minimal 8 karakter"
+              :disabled="loading"
+            />
+            <button
+              type="button"
+              @click="showPassword = !showPassword"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 text-gray-500 hover:text-emerald-700"
+              tabindex="-1"
+            >
+              <span class="text-xs font-semibold">{{ showPassword ? 'Sembunyikan' : 'Lihat' }}</span>
+            </button>
+          </div>
         </div>
-        <div>
+
+        <div class="group">
+          <label for="password_confirmation" class="block text-sm font-semibold text-emerald-700 uppercase tracking-wide">
+            Konfirmasi Kata Sandi Baru <span class="text-red-500">*</span>
+          </label>
+          <div class="relative mt-2">
+            <input
+              id="password_confirmation"
+              :type="showConfirmPassword ? 'text' : 'password'"
+              v-model="password_confirmation"
+              required
+              class="block w-full rounded-lg border border-emerald-200 p-3 pr-10 text-gray-900 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 group-hover:border-emerald-300"
+              placeholder="Ulangi kata sandi baru"
+              :disabled="loading"
+            />
+            <button
+              type="button"
+              @click="showConfirmPassword = !showConfirmPassword"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 text-gray-500 hover:text-emerald-700"
+              tabindex="-1"
+            >
+              <span class="text-xs font-semibold">{{ showConfirmPassword ? 'Sembunyikan' : 'Lihat' }}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="pt-2">
           <button
             type="submit"
             class="w-full bg-emerald-600 text-white py-3 px-6 rounded-full font-semibold hover:bg-emerald-700 transition-all duration-300 hover:shadow-md hover:scale-[1.02]"
             :disabled="loading"
           >
-            {{ loading ? "Resetting..." : "Reset Password" }}
+            {{ loading ? "Memproses..." : "Simpan Kata Sandi Baru" }}
           </button>
         </div>
+
         <button
           type="button"
           @click="$router.push('/login')"
-          class="w-full text-emerald-700 py-3 px-6 rounded-full font-medium hover:text-emerald-800 hover:bg-emerald-50 transition-all duration-300"
+          class="w-full text-emerald-700 py-2 px-6 rounded-full font-medium hover:text-emerald-800 hover:bg-emerald-50 transition-all duration-300"
         >
           Kembali ke Login
         </button>
@@ -87,8 +132,11 @@ export default {
   data() {
     return {
       email: '',
+      tanggal_lahir: '',
       password: '',
       password_confirmation: '',
+      showPassword: false,
+      showConfirmPassword: false,
       loading: false,
       message: '',
       status: false
@@ -100,27 +148,38 @@ export default {
   },
   methods: {
     async handleSubmit() {
+      if (!this.tanggal_lahir) {
+        await this.showAlert('Mohon isi tanggal lahir Anda untuk verifikasi identitas.', 'Peringatan');
+        return;
+      }
+
+      if (this.password !== this.password_confirmation) {
+        await this.showAlert('Konfirmasi kata sandi baru tidak cocok.', 'Peringatan');
+        return;
+      }
+
       this.loading = true;
       this.message = '';
       try {
         const response = await axios.post('/api/reset-password', {
           email: this.email,
+          tanggal_lahir: this.tanggal_lahir,
           password: this.password,
           password_confirmation: this.password_confirmation
         });
         
-        await this.showAlert(response.data.message || 'Password berhasil direset', 'Berhasil');
+        await this.showAlert(response.data.message || 'Kata sandi berhasil diperbarui!', 'Berhasil');
         this.message = response.data.message;
         this.status = true;
 
         setTimeout(() => {
           this.$router.push('/login');
-        }, 2000);
+        }, 1500);
       } catch (error) {
-        const errorMsg = error.response?.data?.message || 'An error occurred';
+        const errorMsg = error.response?.data?.message || 'Terjadi kesalahan. Silakan periksa kembali data Anda.';
         this.message = errorMsg;
         this.status = false;
-        await this.showAlert(errorMsg, 'Error');
+        await this.showAlert(errorMsg, 'Gagal');
       } finally {
         this.loading = false;
       }

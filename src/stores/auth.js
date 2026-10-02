@@ -47,23 +47,14 @@ export const useAuthStore = defineStore({
     async fetchUserProfile() {
       if (this.accessToken) {
         try {
-          const response = await axios.get("/api/users", {
+          const response = await axios.get("/api/profile", {
             headers: {
               Authorization: `Bearer ${this.accessToken}`,
             },
           });
 
-          const currentUserEmail = localStorage.getItem("email");
-          console.log("Current email:", currentUserEmail);
-
-          const currentUser = response.data.data.find(
-            (user) => user.email === currentUserEmail
-          );
-
-          console.log("Found user:", currentUser);
-
-          if (currentUser) {
-            this.setUser(currentUser);
+          if (response.data) {
+            this.setUser(response.data);
           }
         } catch (error) {
           console.error("Error fetching user profile:", error);

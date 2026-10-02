@@ -62,15 +62,47 @@
             <!-- Notification Dropdown -->
             <div 
               v-if="notificationsOpen" 
-              class="dropdown absolute right-0 mt-2 w-72 bg-white shadow-lg rounded-lg p-2 z-50 animate__animated animate__fadeInDown"
+              class="dropdown absolute right-0 mt-2 w-80 bg-white shadow-xl rounded-xl p-0 z-50 animate__animated animate__fadeInDown overflow-hidden border border-gray-100"
             >
+              <div class="px-4 py-3 bg-emerald-50 border-b border-emerald-100 flex justify-between items-center">
+                <span class="font-semibold text-emerald-800">Notifikasi</span>
+                <span v-if="unreadCount > 0" class="text-xs font-bold text-white bg-red-500 px-2.5 py-0.5 rounded-full shadow-sm">{{ unreadCount }} Baru</span>
+              </div>
+              
+              <div class="max-h-72 overflow-y-auto">
+                <div v-if="notifications.length === 0" class="p-6 text-center text-gray-500 text-sm">
+                  Tidak ada notifikasi
+                </div>
+                <template v-else>
+                  <RouterLink 
+                    v-for="notification in notifications.slice(0, 4)" 
+                    :key="notification.id"
+                    to="/notifications" 
+                    @click="toggleNotifications"
+                    class="block px-4 py-3 border-b border-gray-50 hover:bg-emerald-50/50 transition-colors duration-200"
+                    :class="{'bg-emerald-50/30': !notification.read_at}"
+                  >
+                    <div class="flex justify-between items-start mb-1">
+                      <span class="text-xs font-semibold" :class="notification.read_at ? 'text-gray-500' : 'text-emerald-600'">
+                        {{ notification.field_name || 'Soal' }}
+                      </span>
+                      <span class="text-[10px] text-gray-400">
+                        {{ new Date(notification.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) }}
+                      </span>
+                    </div>
+                    <p class="text-sm text-gray-700 line-clamp-2 leading-snug" :class="{'font-medium': !notification.read_at}">
+                      {{ notification.comment }}
+                    </p>
+                  </RouterLink>
+                </template>
+              </div>
+              
               <RouterLink 
                 to="/notifications" 
-                class="dropdown-item flex items-center justify-between"
+                class="block w-full text-center px-4 py-3 text-sm font-semibold text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 transition-colors duration-200"
                 @click="toggleNotifications"
               >
-                <span>Lihat Semua Notifikasi</span>
-                <span v-if="unreadCount > 0" class="text-xs text-white bg-red-600 px-2 py-1 rounded-full">{{ unreadCount }}</span>
+                Lihat Semua Notifikasi
               </RouterLink>
             </div>
           </div>

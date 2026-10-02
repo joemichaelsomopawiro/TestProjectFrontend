@@ -77,13 +77,17 @@
           />
         </div>
         <div class="group">
-          <label for="tanggal_lahir" class="block text-sm font-semibold text-emerald-700 uppercase tracking-wide">Tanggal Lahir</label>
+          <label for="tanggal_lahir" class="block text-sm font-semibold text-emerald-700 uppercase tracking-wide">
+            Tanggal Lahir <span class="text-red-500">*</span>
+          </label>
           <input
             id="tanggal_lahir"
             type="date"
             v-model="tanggal_lahir"
+            required
             class="mt-2 block w-full rounded-lg border border-emerald-200 p-3 text-gray-900 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 group-hover:border-emerald-300"
           />
+          <p class="text-xs text-gray-500 mt-1">Wajib diisi (digunakan untuk keamanan & verifikasi jika lupa kata sandi).</p>
         </div>
         <div class="group">
           <label for="domisili" class="block text-sm font-semibold text-emerald-700 uppercase tracking-wide">Domisili</label>
@@ -158,6 +162,10 @@ const goToLoginPage = () => {
 };
 
 async function registerAccount() {
+  if (!tanggal_lahir.value) {
+    errorMessage.value = "Tanggal lahir wajib diisi untuk verifikasi dan pemulihan akun.";
+    return;
+  }
   try {
     const response = await axios.post("/api/register", {
       name: nama.value,

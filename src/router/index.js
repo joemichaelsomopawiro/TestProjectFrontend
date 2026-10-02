@@ -67,15 +67,7 @@ const router = createRouter({
     {
       path: "/reset-password",
       name: "reset-password",
-      component: ResetPassword,
-      beforeEnter: (to, from, next) => {
-        const email = to.query.email;
-        if (!email) {
-          next({ name: "forgot-password" });
-        } else {
-          next();
-        }
-      },
+      redirect: { name: "forgot-password" },
     },
     {path: '/notifications',name: 'notifications',component: Notification },
     { path: "/users", name: "userlist", component: Profile },

@@ -87,7 +87,7 @@
               </div>
               <div class="bg-emerald-50 p-6 rounded-2xl transition-all duration-300 hover:bg-emerald-100 hover:shadow-lg">
                 <p class="text-sm font-semibold text-emerald-700 uppercase tracking-wide">Tanggal Lahir</p>
-                <p class="mt-2 text-xl font-medium text-gray-900">{{ user?.tanggal_lahir ? new Date(user.tanggal_lahir).toLocaleDateString('id-ID') : 'Not set' }}</p>
+                <p class="mt-2 text-xl font-medium text-gray-900">{{ formatBirthDate(user?.tanggal_lahir) }}</p>
               </div>
               <div class="bg-emerald-50 p-6 rounded-2xl transition-all duration-300 hover:bg-emerald-100 hover:shadow-lg">
                 <p class="text-sm font-semibold text-emerald-700 uppercase tracking-wide">Domisili</p>
@@ -376,7 +376,7 @@ const loadProfile = async () => {
       email: user.value?.email || '',
       NoHp: user.value?.NoHp || '',
       pekerjaan: user.value?.pekerjaan || '',
-      tanggal_lahir: user.value?.tanggal_lahir || '',
+      tanggal_lahir: user.value?.tanggal_lahir ? user.value.tanggal_lahir.substring(0, 10) : '',
       domisili: user.value?.domisili || '',
       informasi_ipbi: user.value?.informasi_ipbi || ''
     };
@@ -418,7 +418,7 @@ const startEditing = () => {
     email: user.value?.email || '',
     NoHp: user.value?.NoHp || '',
     pekerjaan: user.value?.pekerjaan || '',
-    tanggal_lahir: user.value?.tanggal_lahir || '',
+    tanggal_lahir: user.value?.tanggal_lahir ? user.value.tanggal_lahir.substring(0, 10) : '',
     domisili: user.value?.domisili || '',
     informasi_ipbi: user.value?.informasi_ipbi || ''
   };
@@ -622,41 +622,52 @@ const getCategoryClass = (nilai) => {
   }
 };
 
+const formatBirthDate = (dateStr) => {
+  if (!dateStr) return 'Not set';
+  try {
+    if (typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}/.test(dateStr)) {
+      const [year, month, day] = dateStr.substring(0, 10).split('-').map(Number);
+      const d = new Date(year, month - 1, day);
+      return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+    const d = new Date(dateStr);
+    return isNaN(d.getTime()) ? dateStr : d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+  } catch (e) {
+    return dateStr;
+  }
+};
+
 const loadCertificates = async () => {
   try {
-    // Fetch semua soal untuk cek apakah ada file yang sudah di-submit
     const soalNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
     const submittedCertificates = [];
 
-    for (const soalNum of soalNumbers) {
-      try {
-        const response = await axios.get(`/api/soal${soalNum}`, {
+    const results = await Promise.allSettled(
+      soalNumbers.map(soalNum =>
+        axios.get(`/api/soal${soalNum}`, {
           headers: {
             Authorization: `Bearer ${authStore.accessToken}`
           }
-        });
+        }).then(res => ({ soalNum, data: res.data }))
+      )
+    );
 
-        const data = response.data;
-        if (data) {
-          // Check setiap field yang mungkin berisi file sertifikat
-          const fields = Object.keys(data);
-          fields.forEach(field => {
-            if (data[field] && typeof data[field] === 'string' && data[field].trim() !== '') {
-              // Jika field berisi path/file, anggap sebagai sertifikat
-              if (field.includes('file') || field.includes('sertifikat') || field.includes('certificate') || 
-                  field.includes('foto') || field.includes('photo') || field.includes('dokumen') || 
-                  field.includes('document') || field.includes('bukti') || field.includes('proof')) {
-                const certName = `Soal ${soalNum} - ${field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}`;
-                if (!submittedCertificates.includes(certName)) {
-                  submittedCertificates.push(certName);
-                }
+    for (const res of results) {
+      if (res.status === 'fulfilled' && res.value?.data) {
+        const { soalNum, data } = res.value;
+        const fields = Object.keys(data);
+        fields.forEach(field => {
+          if (data[field] && typeof data[field] === 'string' && data[field].trim() !== '') {
+            if (field.includes('file') || field.includes('sertifikat') || field.includes('certificate') || 
+                field.includes('foto') || field.includes('photo') || field.includes('dokumen') || 
+                field.includes('document') || field.includes('bukti') || field.includes('proof')) {
+              const certName = `Soal ${soalNum} - ${field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}`;
+              if (!submittedCertificates.includes(certName)) {
+                submittedCertificates.push(certName);
               }
             }
-          });
-        }
-      } catch (error) {
-        // Skip jika soal tidak ada atau error
-        continue;
+          }
+        });
       }
     }
 

@@ -835,8 +835,9 @@ export default {
     simplifyCity(domisili) {
       if (!domisili) return '';
       
-      // Ambil bagian pertama sebelum koma
-      let city = domisili.split(',')[0]?.trim() || domisili.trim();
+      // Ambil bagian terakhir setelah koma (biasanya kota/provinsi)
+      const parts = domisili.split(',');
+      let city = parts[parts.length - 1]?.trim() || domisili.trim();
       
       // Hapus detail wilayah (Barat, Timur, Selatan, Utara, Pusat, dll)
       const wilayahPatterns = [
